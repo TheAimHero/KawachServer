@@ -8,7 +8,7 @@ import {
 
 const videoRoute = express.Router();
 
-videoRoute.post('/',processVideo)
+videoRoute.post('/',processVideo);
 videoRoute.post('/reddit', processVideoReddit);
 videoRoute.post('/yt', processVideoYt);
 

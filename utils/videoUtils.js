@@ -2,6 +2,7 @@ import axios from 'axios';
 import ffmpeg from 'fluent-ffmpeg';
 import util from 'util';
 import path from 'path';
+import process from 'process';
 import fs from 'fs/promises';
 
 const ffprobe = util.promisify(ffmpeg.ffprobe);
@@ -33,7 +34,7 @@ export async function downloadVideo(reqId, downloadUrl, downloadPath) {
     const videoSize = await getVideoSize(downloadUrl);
     console.log(`Time Taken To Check Size: ${Date.now() - start}`);
     console.log(videoSize);
-    if (videoSize === -1 || videoSize > 10)
+    if (videoSize === -1 || videoSize > Number(process.env.MAX_DOWNLOAD_SIZE))
       throw new Error('Size File Too Big');
     const response = await axios({
       method: 'get',

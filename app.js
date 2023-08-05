@@ -1,11 +1,12 @@
 import express from 'express';
 import ruid from 'express-ruid';
+import dotenv from 'dotenv';
 import cors from 'cors';
+dotenv.config()
 
 import { dbConnect } from './database/dbConnect.js';
 import imageRoute from './routes/imageRoute.js';
 import videoRoute from './routes/videoRoute.js';
-
 const app = express();
 dbConnect();
 

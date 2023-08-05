@@ -1,5 +1,5 @@
 import checkImageDb from '../database/checkImageDb.js';
-import checkImageLink from '../utils/checkImageLink.js';
+import checkImageLink from '../check/checkImageLink.js';
 
 export async function processImage(req, res) {
   const { links } = req.body;

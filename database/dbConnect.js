@@ -1,19 +1,21 @@
-import { createConnection } from "mysql2/promise";
+import process from 'process';
+
+import { createConnection } from 'mysql2/promise';
 
 const connection = await createConnection({
-  host: "localhost",
-  user: "root",
-  password: "1111",
-  database: "links",
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  database: process.env.DATABASE,
 });
 
 export function dbConnect() {
   connection.connect((err) => {
     if (err) {
-      console.error("Error connecting to the database:", err.message);
+      console.error('Error connecting to the database:', err.message);
       return;
     }
-    console.log("Connected to the database!");
+    console.log('Connected to the database!');
   });
 }
 

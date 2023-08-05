@@ -2,7 +2,7 @@ import {
   checkVideoLinkReddit,
   checkVideoLinkYt,
   checkVideoLink,
-} from '../utils/checkVideoLink.js';
+} from '../check/checkVideoLink.js';
 
 export async function processVideoReddit(req, res) {
   try {
