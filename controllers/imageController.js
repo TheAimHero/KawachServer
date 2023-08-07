@@ -1,13 +1,23 @@
-import checkImageDb from '../database/checkImageDb.js';
+import { insertInDb, queryDbArr } from '../utils/dbUtils.js';
 import checkImageLink from '../check/checkImageLink.js';
+import imageModel from '../dbModel/imageModel.js';
 
 export async function processImage(req, res) {
   const { links } = req.body;
-  const linksInDb = await checkImageDb(links);
-  const toCheck = links.filter((link) => !linksInDb.includes(link)); // get the links that are in the db
-  const badLinksByModel = await checkImageLink(toCheck);
-  const badLinks = linksInDb.concat(badLinksByModel).filter((link) => {
-    return Boolean(link);
-  });
-  res.status(200).json({ message: 'status', data: badLinks });
+  const [toCheck, alreadyPresent, dbCacheLinks] = await queryDbArr(
+    links,
+    imageModel
+  );
+
+  if (toCheck.length === 0) {
+    return res.status(200).json({ message: 'status', data: dbCacheLinks });
+  }
+
+  const modelResults = await checkImageLink(toCheck);
+
+  await insertInDb(modelResults, imageModel);
+
+  res
+    .status(200)
+    .json({ message: 'status', data: { ...alreadyPresent, ...modelResults } });
 }

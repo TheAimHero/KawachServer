@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer';
 import axios from 'axios';
 
-import insertInImageDb from '../database/insertInImageDb.js';
 import model, { checkNsfw, preProcessImage } from '../utils/modelUtils.js';
 
 export default async function checkImageLink(links) {
@@ -12,14 +11,13 @@ export default async function checkImageLink(links) {
     const buf = Buffer.from(response.data, 'binary');
     const preProcessedImage = preProcessImage(buf);
     const outputTensor = model.predict(preProcessedImage);
-    if (await checkNsfw(outputTensor)) return link;
-    return;
+    if (await checkNsfw(outputTensor)) return { link, type: 'nsfw' };
+    return { link, type: 'sfw' };
   });
 
   const result = (await Promise.all(promiseArr)).filter((link) =>
     Boolean(link)
   );
 
-  insertInImageDb(result);
   return result;
 }

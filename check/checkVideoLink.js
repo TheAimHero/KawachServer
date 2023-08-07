@@ -2,12 +2,8 @@ import axios from 'axios';
 import { mkdir } from 'fs/promises';
 
 import { preProcessAndPredictVideo } from '../utils/modelUtils.js';
-import {
-  downloadVideo,
-  extractFrames,
-  getPaths,
-  deleteDir,
-} from '../utils/videoUtils.js';
+import { downloadVideo, extractFrames } from '../utils/videoUtils.js';
+import { deleteDir, getPaths } from '../utils/fsUtils.js';
 import { ytDownload } from '../utils/ytUtils.js';
 
 export async function checkVideoLinkReddit(link, reqId) {
@@ -27,7 +23,11 @@ export async function checkVideoLinkReddit(link, reqId) {
     await extractFrames(videoPath, videoFramePath);
     const prediction = await preProcessAndPredictVideo(videoFramePath);
     await deleteDir(videoDir);
-    return prediction;
+    if (prediction) {
+      return { link, type: 'nsfw' };
+    } else {
+      return { link, type: 'sfw' };
+    }
   } catch (error) {
     throw new Error(error.message);
   }
