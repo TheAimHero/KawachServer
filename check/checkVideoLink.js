@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { mkdir } from 'fs/promises';
 
-import { preProcessAndPredictVideo } from '../utils/modelUtils.js';
+import {
+  preProcessAndPredictObsceneVideo,
+  preProcessAndPredictVoilentVideo,
+} from '../utils/modelUtils.js';
 import { downloadVideo, extractFrames } from '../utils/videoUtils.js';
 import { deleteDir, getPaths } from '../utils/fsUtils.js';
 import { ytDownload } from '../utils/ytUtils.js';
@@ -21,7 +24,7 @@ export async function checkVideoLinkReddit(link, reqId) {
       throw new Error(err.message);
     });
     await extractFrames(videoPath, videoFramePath);
-    const prediction = await preProcessAndPredictVideo(videoFramePath);
+    const prediction = await preProcessAndPredictObsceneVideo(videoFramePath);
     await deleteDir(videoDir);
     if (prediction) {
       return { link, type: 'nsfw' };
@@ -33,13 +36,13 @@ export async function checkVideoLinkReddit(link, reqId) {
   }
 }
 
-export async function checkVideoLinkYt(link, reqId) {
+export async function checkObsceneVideoLinkYt(link, reqId) {
   try {
     const [videoDir, videoPath, videoFramePath] = getPaths(reqId);
     await mkdir(videoFramePath, { recursive: true });
     await ytDownload(link, videoPath);
     await extractFrames(videoPath, videoFramePath);
-    const prediction = await preProcessAndPredictVideo(videoFramePath);
+    const prediction = await preProcessAndPredictObsceneVideo(videoFramePath);
     await deleteDir(videoDir);
     return prediction;
   } catch (error) {
@@ -47,7 +50,7 @@ export async function checkVideoLinkYt(link, reqId) {
   }
 }
 
-export async function checkVideoLink(link, reqId) {
+export async function checkObsceneVideoLink(link, reqId) {
   try {
     const videoUrl = link;
     if (!videoUrl) throw new Error('Video Not Found');
@@ -59,9 +62,29 @@ export async function checkVideoLink(link, reqId) {
       throw new Error(err.message);
     });
     await extractFrames(videoPath, videoFramePath);
-    const prediction = await preProcessAndPredictVideo(videoFramePath);
+    const prediction = await preProcessAndPredictObsceneVideo(videoFramePath);
     await deleteDir(videoDir);
     return prediction;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function checkVoilentVideoLink(link, reqId) {
+  try {
+    const [videoDir, videoPath, videoFramePath] = getPaths(reqId);
+
+    await mkdir(videoFramePath, { recursive: true });
+    console.log('link:', link);
+    await downloadVideo(reqId, link, videoPath);
+    await extractFrames(videoPath, videoFramePath);
+    const prediction = await preProcessAndPredictVoilentVideo(videoFramePath);
+    await deleteDir(videoDir);
+    if (prediction) {
+      return { link, type: 'nsfw' };
+    } else {
+      return { link, type: 'sfw' };
+    }
   } catch (error) {
     throw new Error(error.message);
   }

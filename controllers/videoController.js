@@ -1,10 +1,12 @@
 import {
   checkVideoLinkReddit,
-  checkVideoLinkYt,
-  checkVideoLink,
+  checkObsceneVideoLinkYt,
+  checkVoilentVideoLink,
+  checkObsceneVideoLink,
 } from '../check/checkVideoLink.js';
 
 import videoRedditModel from '../dbModel/videoRedditModel.js';
+import videoViolentModel from '../dbModel/videoViolentModel.js';
 
 import { insertInDb, queryDbSingle } from '../utils/dbUtils.js';
 
@@ -34,42 +36,55 @@ export async function processVideoReddit(req, res) {
 export async function processVideoYt(req, res) {
   try {
     const start = Date.now();
-    const result = await checkVideoLinkYt(req.body.link, req.rid).catch((e) => {
-      throw new Error(e.message);
-    });
+    const result = await checkObsceneVideoLinkYt(req.body.link, req.rid).catch(
+      (e) => {
+        throw new Error(e.message);
+      }
+    );
     if (result) {
       console.log(`Time Taken To Check: ${Date.now() - start}\n`);
-      return res
-        .status(200)
-        .json({ status: 'success', data: { result: true } });
-    } else {
-      console.log(`Time Taken To Check: ${Date.now() - start}\n`);
-      return res
-        .status(200)
-        .json({ status: 'success', data: { result: false } });
+      return res.status(200).json({ status: 'success', data: result });
     }
   } catch (error) {
     res.status(500).json({ status: 'error', message: error.message });
   }
 }
 
-export async function processVideo(req, res) {
+export async function processObsceneVideo(req, res) {
   try {
     const start = Date.now();
-    const result = await checkVideoLink(req.body.link, req.rid).catch((e) => {
-      throw new Error(e.message);
-    });
+    const result = await checkObsceneVideoLink(req.body.link, req.rid).catch(
+      (e) => {
+        throw new Error(e.message);
+      }
+    );
     if (result) {
       console.log(`Time Taken To Check: ${Date.now() - start}\n`);
-      return res
-        .status(200)
-        .json({ status: 'success', data: { result: true } });
-    } else {
+      return res.status(200).json({ status: 'success', data: result });
+    }
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+}
+
+export async function processViolentVideo(req, res) {
+  try {
+    const start = Date.now();
+    const result = await checkVoilentVideoLink(req.body.link, req.rid).catch(
+      (e) => {
+        throw new Error(e.message);
+      }
+    );
+    if (!result) {
       console.log(`Time Taken To Check: ${Date.now() - start}\n`);
       return res
-        .status(200)
-        .json({ status: 'success', data: { result: false } });
+        .status(500)
+        .json({ status: 'success', message: 'Internal Error' });
     }
+
+    insertInDb(result, VideoViolentModel);
+
+    return res.status(500).json({ status: 'success', data: result });
   } catch (error) {
     res.status(500).json({ status: 'error', message: error.message });
   }

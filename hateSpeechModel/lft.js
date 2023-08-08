@@ -31,15 +31,11 @@ function extractVisibleTextFromWebpage(htmlContent) {
   return cleanedText;
 }
 
-export default async function hateSpeechProcess(url = '') {
-  if (url) {
-    if (!url.startsWith('http')) {
-      const webpageContent = await getWebpageContent(url);
+export default async function hateSpeechProcess(url, textPath) {
+  const webpageContent = await getWebpageContent(url);
 
-      if (webpageContent) {
-        const extractedText = extractVisibleTextFromWebpage(webpageContent);
-        if (extractedText) writeFile('output.txt', extractedText);
-      }
-    }
+  if (webpageContent) {
+    const extractedText = extractVisibleTextFromWebpage(webpageContent);
+    if (extractedText) await writeFile(textPath, extractedText);
   }
 }

@@ -8,6 +8,7 @@ dotenv.config();
 
 import imageRoute from './routes/imageRoute.js';
 import videoRoute from './routes/videoRoute.js';
+import ratingRoute from './routes/ratingRoute.js';
 import hateSpeechRoute from './routes/hateSpeechRoute.js';
 import mongoose from 'mongoose';
 const app = express();
@@ -26,6 +27,7 @@ app.use(ruid({ prefixRoot: '' }));
 app.use('/image', imageRoute);
 app.use('/video', videoRoute);
 app.use('/hate-speech', hateSpeechRoute);
+app.use('/rate',ratingRoute)
 // app.get("*", errorRoute);
 
 app.listen(3000, () => console.log('Server is running on port 3000'));

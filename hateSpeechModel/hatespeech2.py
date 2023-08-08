@@ -83,8 +83,10 @@ if __name__ == "__main__":
 
     lines_with_hate_speech = preprocess_text_file(url)
 
-    has_hate_speech = len(lines_with_hate_speech) > 0
-    if has_hate_speech:
-        print("true")
-    else:
-        print("false")
+    print(lines_with_hate_speech)
+
+    # has_hate_speech = len(lines_with_hate_speech) > 0
+    # if has_hate_speech:
+    #     print("true")
+    # else:
+    #     print("false")

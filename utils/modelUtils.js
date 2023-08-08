@@ -4,8 +4,11 @@ import fs from 'fs/promises';
 import { Buffer } from 'buffer';
 
 const __dirname = path.resolve();
-const modelPath = path.join(__dirname, '/imageModel/model.json');
-const model = await tf.loadLayersModel(`file://${modelPath}`);
+const modelImagePath = path.join(__dirname, '/imageModel/model.json');
+const imageModel = await tf.loadLayersModel(`file://${modelImagePath}`);
+
+const modelVideoPath = path.join(__dirname, '/videoModel/model.json');
+const videoModel = await tf.loadLayersModel(`file://${modelVideoPath}`);
 
 export function preProcessImage(buf) {
   const tensor = tf.node.decodeImage(buf, 3);
@@ -14,7 +17,7 @@ export function preProcessImage(buf) {
   return expandedImage;
 }
 
-export async function preProcessAndPredictVideo(directoryPath) {
+export async function preProcessAndPredictObsceneVideo(directoryPath) {
   const allFiles = await fs.readdir(directoryPath);
   const jpgFiles = allFiles.filter(
     (file) => path.extname(file).toLowerCase() === '.jpg'
@@ -27,7 +30,29 @@ export async function preProcessAndPredictVideo(directoryPath) {
     const fileData = await fs.readFile(filePath);
     const buf = Buffer.from(fileData);
     const imgPreProcessed = preProcessImage(buf);
-    const outputTensor = model.predict(imgPreProcessed);
+    const outputTensor = imageModel.predict(imgPreProcessed);
+    if (await checkNsfw(outputTensor)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export async function preProcessAndPredictVoilentVideo(directoryPath) {
+  const allFiles = await fs.readdir(directoryPath);
+  const jpgFiles = allFiles.filter(
+    (file) => path.extname(file).toLowerCase() === '.jpg'
+  );
+
+  for (let i = 0; i < jpgFiles.length; i++) {
+    const file = jpgFiles[i];
+
+    const filePath = path.join(directoryPath, file);
+    const fileData = await fs.readFile(filePath);
+    const buf = Buffer.from(fileData);
+    const imgPreProcessed = preProcessImage(buf);
+    const outputTensor = videoModel.predict(imgPreProcessed);
     if (await checkNsfw(outputTensor)) {
       return true;
     }
@@ -51,4 +76,4 @@ export async function checkNsfw(outputTensor) {
   return false;
 }
 
-export default model;
+export default imageModel;
