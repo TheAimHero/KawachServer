@@ -8,6 +8,6 @@ import {
 const hateSpeechRoute = express.Router();
 
 hateSpeechRoute.get('/', hateSpeechTextRoute);
-hateSpeechRoute.get('/url', hateSpeechUrlRoute);
+hateSpeechRoute.post('/url', hateSpeechUrlRoute);
 
 export default hateSpeechRoute;

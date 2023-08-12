@@ -32,10 +32,16 @@ function extractVisibleTextFromWebpage(htmlContent) {
 }
 
 export default async function hateSpeechProcess(url, textPath) {
-  const webpageContent = await getWebpageContent(url);
+  try {
+    const webpageContent = await getWebpageContent(url);
 
-  if (webpageContent) {
-    const extractedText = extractVisibleTextFromWebpage(webpageContent);
-    if (extractedText) await writeFile(textPath, extractedText);
+    if (webpageContent) {
+      const extractedText = extractVisibleTextFromWebpage(webpageContent);
+      if (extractedText) await writeFile(textPath, extractedText);
+      return true;
+    }
+  } catch (e) {
+    console.error(e.message);
+    return false;
   }
 }

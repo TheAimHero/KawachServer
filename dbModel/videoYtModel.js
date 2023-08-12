@@ -18,11 +18,12 @@ const videoYtSchema = new mongoose.Schema({
   },
 });
 
-videoYtSchema.post(/^find|save/, (doc) => {
+videoYtSchema.post('find', (doc) => {
   doc.dateAccessed = Date.now();
+  doc.save();
   return;
 });
 
-const VideoYtModel = mongoose.model('VideoYtLink', videoYtSchema);
+const VideoYtModel = mongoose.model('VideoYt', videoYtSchema);
 
 export default VideoYtModel;

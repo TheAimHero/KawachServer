@@ -5,7 +5,11 @@ import fs from 'fs/promises';
 import hateSpeechProcess from '../hateSpeechModel/lft.js';
 import { getPaths } from '../utils/fsUtils.js';
 
-const modelPath = path.join(path.resolve(), 'hateSpeechModel/hatespeech2.py');
+const modelPathHateSpeech = path.join(
+  path.resolve(),
+  'hateSpeechModel/hatespeech2.py'
+);
+const modelPathContext = path.join(path.resolve(), '/contextDetection/1.py');
 
 export async function hateSpeechTextRoute(req, res) {
   const { text } = req.body;
@@ -14,37 +18,7 @@ export async function hateSpeechTextRoute(req, res) {
 
   await fs.writeFile(textPath, text);
 
-  const childProcess = spawn('python', [modelPath, textPath]);
-
-  childProcess.stdout.on('data', (data) => {
-    return res.status(200).json({
-      status: 'success',
-      data: { result: Boolean(data.toString().trim()) },
-    });
-  });
-
-  childProcess.stderr.on('data', (data) => {
-    return res.status(500).json({
-      status: 'error',
-      data: { result: Boolean(data.toString().trim()) },
-    });
-  });
-}
-
-export async function hateSpeechUrlRoute(req, res) {
-  const { link: url } = req.body;
-  const { rid: reqId } = req;
-  const [textPath] = getPaths(reqId, 'text');
-
-  if (!url.startsWith('http')) {
-    return res
-      .status(400)
-      .json({ status: 'error', data: { message: 'Incorrect URL' } });
-  }
-
-  await hateSpeechProcess(url, textPath);
-
-  const childProcess = spawn('python', [modelPath, textPath]);
+  const childProcess = spawn('python', [modelPathHateSpeech, textPath]);
 
   childProcess.stdout.on('data', (data) => {
     return res.status(200).json({
@@ -54,9 +28,53 @@ export async function hateSpeechUrlRoute(req, res) {
   });
 
   childProcess.stderr.on('data', (data) => {
-    return res.status(500).json({
-      status: 'error',
-      data: { result: Boolean(data.toString().trim()) },
-    });
+    return res
+      .status(500)
+      .json({ status: 'error', data: { result: data.toString().trim() } });
   });
+}
+
+export async function hateSpeechUrlRoute(req, res) {
+  try {
+    console.log('hateSpeechUrlRoute');
+    const { link: url } = req.body;
+    const { rid: reqId } = req;
+    const [textPath] = getPaths(reqId, 'text');
+    if (!url.startsWith('http')) {
+      throw new Error('Invalid URL');
+    }
+
+    const resObj = {};
+
+    const bool = await hateSpeechProcess(url, textPath);
+    if (!bool) {
+      throw new Error('Internal Error');
+    }
+
+    const childProcessHateSpeech = spawn('python', [
+      modelPathHateSpeech,
+      textPath,
+    ]);
+
+    childProcessHateSpeech.stdout.on('data', (data) => {
+      resObj.hateSpeech = data.toString().trim();
+      return res.status(200).json({ status: 'success', data: resObj });
+    });
+
+    childProcessHateSpeech.stderr.on('data', () => {
+      return;
+    });
+
+    const childProcessContext = spawn('python', [modelPathContext, textPath]);
+
+    childProcessContext.stdout.on('data', (data) => {
+      resObj.context = data.toString().trim();
+    });
+
+    childProcessContext.stderr.on('data', () => {
+      return;
+    });
+  } catch (e) {
+    return;
+  }
 }

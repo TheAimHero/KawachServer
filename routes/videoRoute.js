@@ -4,7 +4,7 @@ import {
   processVideoReddit,
   processVideoYt,
   processObsceneVideo,
-   processViolentVideo
+  processViolentVideo,
 } from '../controllers/videoController.js';
 
 const videoRoute = express.Router();

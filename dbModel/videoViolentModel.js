@@ -24,9 +24,6 @@ videoViolentSchema.post('find', async (doc) => {
   return;
 });
 
-const VideoViolentModel = mongoose.model(
-  'VideoViolentLink',
-  videoViolentSchema
-);
+const VideoViolentModel = mongoose.model('VideoViolent', videoViolentSchema);
 
 export default VideoViolentModel;

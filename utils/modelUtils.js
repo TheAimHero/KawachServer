@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs-node';
 import path from 'path';
+// import * as jpeg from 'jpeg-js';
 import fs from 'fs/promises';
 import { Buffer } from 'buffer';
 
@@ -16,6 +17,15 @@ export function preProcessImage(buf) {
   const expandedImage = resized.expandDims();
   return expandedImage;
 }
+
+// export function preProcessViolentImage(buf) {
+//   const tensor = tf.node.decodeImage(buf, 3);
+//   const inputImage = tf.tensor3d(tensor, [64, 64, 3]);
+//
+//   const finalImages = tiled.expandDims(0);
+//   const tiledImages = tf.tile(expandedInputImage, [null]);
+//   return tiledImages;
+// }
 
 export async function preProcessAndPredictObsceneVideo(directoryPath) {
   const allFiles = await fs.readdir(directoryPath);
@@ -50,8 +60,8 @@ export async function preProcessAndPredictVoilentVideo(directoryPath) {
 
     const filePath = path.join(directoryPath, file);
     const fileData = await fs.readFile(filePath);
-    const buf = Buffer.from(fileData);
-    const imgPreProcessed = preProcessImage(buf);
+    // const buf = Buffer.from(fileData);
+    const imgPreProcessed = preProcessViolentImage(fileData);
     const outputTensor = videoModel.predict(imgPreProcessed);
     if (await checkNsfw(outputTensor)) {
       return true;

@@ -11,6 +11,8 @@ const imageSchema = new mongoose.Schema({
 
   dateAccessed: { type: Date },
 
+  numAccessed: { type: Number, default: 1 },
+
   type: {
     type: String,
     required: true,
@@ -18,13 +20,15 @@ const imageSchema = new mongoose.Schema({
   },
 });
 
+
 imageSchema.post('find', (doc) => {
   doc.forEach(async (d) => {
     d.dateAccessed = Date.now();
+    d.numAccessed += 1;
     await d.save();
   });
 });
 
-const imageModel = mongoose.model('imageLink', imageSchema);
+const imageModel = mongoose.model('Image', imageSchema);
 
 export default imageModel;

@@ -27,9 +27,9 @@ export async function checkVideoLinkReddit(link, reqId) {
     const prediction = await preProcessAndPredictObsceneVideo(videoFramePath);
     await deleteDir(videoDir);
     if (prediction) {
-      return { link, type: 'nsfw' };
+      return { link: videoUrl, type: 'nsfw' };
     } else {
-      return { link, type: 'sfw' };
+      return { link: videoUrl, type: 'sfw' };
     }
   } catch (error) {
     throw new Error(error.message);
@@ -44,7 +44,11 @@ export async function checkObsceneVideoLinkYt(link, reqId) {
     await extractFrames(videoPath, videoFramePath);
     const prediction = await preProcessAndPredictObsceneVideo(videoFramePath);
     await deleteDir(videoDir);
-    return prediction;
+    if (prediction) {
+      return { link, type: 'nsfw' };
+    } else {
+      return { link, type: 'sfw' };
+    }
   } catch (error) {
     throw new Error(error.message);
   }
@@ -70,7 +74,7 @@ export async function checkObsceneVideoLink(link, reqId) {
   }
 }
 
-export async function checkVoilentVideoLink(link, reqId) {
+export async function checkViolentVideoLink(link, reqId) {
   try {
     const [videoDir, videoPath, videoFramePath] = getPaths(reqId);
 

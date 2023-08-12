@@ -23,6 +23,6 @@ videoSchema.post(/^find|save/, (doc) => {
   return;
 });
 
-const VideoModel = mongoose.model('VideoLink', videoSchema);
+const videoModel = mongoose.model('Video', videoSchema);
 
-export default VideoModel;
+export default videoModel;

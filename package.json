@@ -19,11 +19,16 @@
     "express-ruid": "^1.1.5",
     "firebase-admin": "^11.10.1",
     "fluent-ffmpeg": "^2.1.2",
+    "image-type": "^5.2.0",
+    "jpeg-js": "^0.4.4",
     "mongoose": "^7.4.2",
+    "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.5.2",
     "node-fetch": "^3.3.1",
+    "node-xlsx": "^0.23.0",
     "path": "^0.12.7",
+    "sharp": "^0.32.4",
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {

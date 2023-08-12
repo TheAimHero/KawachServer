@@ -3,6 +3,11 @@ export async function insertInDb(linksArr, model) {
   return data;
 }
 
+export async function insertInDbSingle(link, model) {
+  const data = await model.create(link);
+  return data;
+}
+
 export async function queryDbArr(links, model) {
   const dbCachedLinks = await model.find({ link: { $in: links } });
 

@@ -24,6 +24,6 @@ videoRedditSchema.post('find', async (doc) => {
   return;
 });
 
-const VideoRedditModel = mongoose.model('VideoRedditLink', videoRedditSchema);
+const VideoRedditModel = mongoose.model('VideoReddit', videoRedditSchema);
 
 export default VideoRedditModel;
